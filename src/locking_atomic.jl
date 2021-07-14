@@ -5,7 +5,7 @@ mutable struct LockingAtomic{T}
 	lock::ReentrantLock
 	data::T
 
-	function ConcurrentHeap(data::T) where T
+	function LockingAtomic(data::T) where T
 		lock = ReentrantLock()
 		new{T}(lock, data)
 	end

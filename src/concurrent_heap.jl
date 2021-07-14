@@ -45,14 +45,14 @@ function iterate(c::ConcurrentHeap, state...)
 	end
 end
 
-function Threads.foreach(f, heap::ConcurrentHeap; ntasks=nthreads())
+function threaded_foreach(f, iter; ntasks=nthreads())
 	starve_check = Atomic{Bool}(false)
 
-	while !isempty(heap)
+	while !isempty(iter)
 		@sync for _ in 1:ntasks
-			@spawn for item in heap
-				stop = f(item)
-				(starve_check[] || stop) && break
+			@spawn for item in iter
+				f(item)
+				starve_check[] && break
 			end
 			starve_check[] = true
 		end

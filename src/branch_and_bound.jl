@@ -14,9 +14,10 @@ end
 
 function branch_and_bound(root, bound, branch, converged)
 	incumbent, work = solve_root(root, bound, branch)
-	iter = takewhile(!converged, work)
+	not_converged(x) = !converged(incumbent[], x)
+	iter = takewhile(not_converged, work)
 
-	Threads.foreach(iter) do node
+	threaded_foreach(iter) do node
 		lower, feasible = bound(node)
 		branches = branch(node, lower, feasible)
 
