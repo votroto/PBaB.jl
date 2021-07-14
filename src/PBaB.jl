@@ -1,5 +1,7 @@
 module PBaB
 
-greet() = print("Hello World!")
+export branch_and_bound
+
+include("branch_and_bound.jl")
 
 end # module
