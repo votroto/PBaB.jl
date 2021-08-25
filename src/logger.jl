@@ -5,6 +5,7 @@ end
 
 function logger(io::Base.TTY, gap)
 	progress = ProgressThresh(gap; desc="B&B:", output=io, showspeed=true)
+	ProgressMeter.update!(progress, typemax(gap))
 	Logger(progress, gap)
 end
 
