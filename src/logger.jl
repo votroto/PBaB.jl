@@ -22,6 +22,6 @@ function update(l::Logger{<:IOStream}, inc, prior, lower, feas, cut)
 	println(l.tgt, join([lower, feas], " "))
 end
 
-finish(l::Logger{ProgressThresh}) = ProgressMeter.finish!(l.tgt)
+finish(l::Logger{<:ProgressThresh}) = ProgressMeter.finish!(l.tgt)
 
-finish(l::Logger{IOStream}) = nothing
+finish(l::Logger{<:IOStream}) = nothing
