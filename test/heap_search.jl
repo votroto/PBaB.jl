@@ -18,14 +18,20 @@ function branch(node)
 	[Node(node.xs, i) for i in branches if i <= length(node.xs)]
 end
 
+mutable struct MockCountingIO <: IO
+	count::Int
+end
+Base.print(s::MockCountingIO, x...) = s.count += 1
+
 # -----------------------------------------------------------------------------
 
 function bab_finds_min(rng=MersenneTwister(2021))
 	dat = -1 .* heapify(shuffle(rng, 1:100))
 
+	out = devnull
 	root = Node(dat, 1)
 
-	min_val, min_arg = branch_and_bound(root, bound, branch)
+	min_val, min_arg = branch_and_bound(root, bound, branch; out)
 
 	@test min_val == minimum(dat)
 	@test min_val == dat[min_arg]
@@ -34,11 +40,11 @@ end
 function bab_solves_in_root(rng=MersenneTwister(2021))
 	dat = heapify(shuffle(rng, 1:100))
 
-	out = IOBuffer()
+	out = MockCountingIO(0)
 	root = Node(dat, 1)
 	_bound = (node) -> bound(node; lb = 1)
 
 	branch_and_bound(root, _bound, branch; out)
 
-	@test countlines(out) <= 1
+	@test out.count == 0
 end
