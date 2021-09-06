@@ -1,6 +1,6 @@
 import Base: eltype, IteratorSize, iterate, push!, pop!, isempty, first
 
-using DataStructures: AbstractHeap
+using DataStructures: AbstractHeap, BinaryHeap
 
 mutable struct ConcurrentHeap{T}
 	lock::ReentrantLock
@@ -11,6 +11,8 @@ mutable struct ConcurrentHeap{T}
 		new{T}(lock, data)
 	end
 end
+
+make_open_set(branches) = ConcurrentHeap(BinaryHeap(Base.By(first), branches))
 
 first(c::ConcurrentHeap) = first(c.data)
 isempty(c::ConcurrentHeap) = isempty(c.data)

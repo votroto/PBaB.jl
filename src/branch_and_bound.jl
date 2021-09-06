@@ -1,7 +1,4 @@
 
-using DataStructures: BinaryMinHeap
-using ProgressMeter
-
 include("logger.jl")
 include("pop_while.jl")
 include("locking_atomic.jl")
@@ -11,7 +8,7 @@ function solve_root(node, bound, branch)
 	lower, feasible... = bound(node)
 	branches = tuple.(lower, branch(node))
 
-	LockingAtomic(feasible), ConcurrentHeap(BinaryMinHeap(branches))
+	LockingAtomic(feasible), make_open_set(branches)
 end
 
 function branch_and_bound(root, bound, branch; gap=eps(), out=stderr)

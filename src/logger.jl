@@ -1,3 +1,5 @@
+using ProgressMeter
+
 struct Logger{O}
 	tgt::O
 	gap
@@ -9,7 +11,7 @@ function logger(io::Base.TTY, gap)
 	Logger(progress, gap)
 end
 
-function logger(io::IOStream, gap)
+function logger(io::IO, gap)
 	Logger(io, gap)
 end
 
@@ -18,10 +20,10 @@ function update(l::Logger{<:ProgressThresh}, inc, prior, lower, feas, cut)
 	ProgressMeter.update!(l.tgt, inc - prior, showvalues=vals)
 end
 
-function update(l::Logger{<:IOStream}, inc, prior, lower, feas, cut)
+function update(l::Logger{<:IO}, inc, prior, lower, feas, cut)
 	println(l.tgt, join([lower, feas], " "))
 end
 
 finish(l::Logger{<:ProgressThresh}) = ProgressMeter.finish!(l.tgt)
 
-finish(l::Logger{<:IOStream}) = nothing
+finish(l::Logger{<:IO}) = nothing
