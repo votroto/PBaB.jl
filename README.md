@@ -11,7 +11,7 @@ Given functions
  - `bound :: Node -> lower_bound, feasible_value, feasible_arg`,
  - `branch :: Node -> Node[]`,
 
-a root `Node`, and a `gap`, PBaB will branch and bound in parallel using a best-first strategy. PBaB stops when it finds a feasible solution with a value within `gap` of the *glabal minimum*.
+a root `Node`, and a `gap`, PBaB will branch and bound in parallel using a best-first strategy. PBaB stops when it finds a feasible solution with a value within `gap` of the *global minimum*.
 
 ## Experimental!
 
