@@ -16,7 +16,7 @@ end
 
 function branch_and_bound(root, bound, branch; gap=eps(), out=stderr)
 	incumbent, work = solve_root(root, bound, branch)
-	not_fathom(x) = !isapprox(first(incumbent[]), first(x); atol=gap)
+	not_fathom(x) = first(incumbent[]) - gap >= first(x)
 	iter = PopWhile(not_fathom, work)
 	log = logger(out, gap)
 
