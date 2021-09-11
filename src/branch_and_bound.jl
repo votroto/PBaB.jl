@@ -14,10 +14,10 @@ end
 function branch_and_bound(root, bound, branch; gap=eps(), out=stderr)
 	incumbent, work = solve_root(root, bound, branch)
 	not_fathom(x) = first(incumbent[]) - gap >= first(x)
-	iter = PopWhile(not_fathom, work)
+	branch_iterator = PopWhile(not_fathom, work)
 	log = logger(out, gap)
 
-	Threads.foreach(iter) do (prior, node)
+	Threads.foreach(branch_iterator) do (prior, node)
 		lower, feasible... = bound(node)
 		branches = tuple.(lower, branch(node))
 

@@ -17,19 +17,15 @@ IteratorSize(::PopWhile) = SizeUnknown()
 isempty(i::PopWhile) = isempty(i.c) || !i.pred(first(i.c))
 
 function iterate(i::PopWhile, state...)
-	if !isempty(i)
-		pop!(i.c), nothing
-	else
+	if isempty(i)
 		nothing
 	end
-end
-
-function _inner_loop(f, iter, starve_check)
-	for item in iter
-		f(item)
-		starve_check[] && break
+	p = pop!(i.c)
+	if isnothing(p)
+		nothing
+	else
+		p, nothing
 	end
-	starve_check[] = true
 end
 
 function Threads.foreach(f, iter::PopWhile; ntasks=nthreads())
@@ -37,7 +33,14 @@ function Threads.foreach(f, iter::PopWhile; ntasks=nthreads())
 
 	while !isempty(iter)
 		@sync for _ in 1:ntasks
-			@spawn _inner_loop(f, iter, starve_check)
+			@spawn try
+				for item in iter
+					f(item)
+					starve_check[] && break
+				end
+			finally
+				starve_check[] = true
+			end
 		end
 		starve_check[] = false
 	end

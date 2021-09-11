@@ -15,7 +15,8 @@ end
 
 function branch(node)
 	branches = [heapleft(node.i), heapright(node.i)]
-	[Node(node.xs, i) for i in branches if i <= length(node.xs)]
+	valid = filter((<=)(length(node.xs)), branches)
+	Node.(Ref(node.xs), valid)
 end
 
 mutable struct MockCountingIO <: IO
