@@ -12,9 +12,9 @@ function solve_root(node, bound, branch)
 end
 
 function branch_and_bound(root, bound, branch; gap=eps(), out=stderr)
-	incumbent, work = solve_root(root, bound, branch)
+	incumbent, pending = solve_root(root, bound, branch)
 	not_fathom(x) = first(incumbent[]) - gap >= first(x)
-	branch_iterator = PopWhile(not_fathom, work)
+	branch_iterator = PopWhile(not_fathom, pending)
 	log = logger(out, gap)
 
 	Threads.foreach(branch_iterator) do (prior, node)
@@ -23,11 +23,11 @@ function branch_and_bound(root, bound, branch; gap=eps(), out=stderr)
 
 		atomic_min!(incumbent, feasible)
 		pruned = filter(not_fathom, branches)
-		push!(work, pruned...)
+		push!(pending, pruned...)
 
-		update(log, first(incumbent[]), prior, lower, feasible...)
+		update!(log, first(incumbent[]), prior, lower, feasible...)
 	end
 
-	finish(log)
-	incumbent[]
+	finish!(log)
+	incumbent[], stats(log)
 end

@@ -1,29 +1,25 @@
 using ProgressMeter
+using Base.Threads: Atomic, atomic_add!
 
-struct Logger{O}
-	tgt::O
-	gap
-end
 
-function logger(io::Base.TTY, gap)
-	progress = ProgressThresh(gap; desc="B&B:", output=io, showspeed=true)
-	ProgressMeter.update!(progress, typemax(gap))
-	Logger(progress, gap)
+mutable struct Logger{O,G}
+	io::O
+	gap::G
+	nodes_solved::Atomic{Int}
 end
 
 function logger(io::IO, gap)
-	Logger(io, gap)
+	progress = ProgressThresh(gap; desc="B&B:", output=io, showspeed=true)
+	ProgressMeter.update!(progress, typemax(gap))
+	Logger(progress, gap, Atomic{Int}(1))
 end
 
-function update(l::Logger{<:ProgressThresh}, inc, prior, lower, feas, cut)
-	vals = [(:lower, lower), (:feasible, feas)]
-	ProgressMeter.update!(l.tgt, inc - prior, showvalues=vals)
+function update!(l::Logger{<:ProgressThresh}, inc, prior, lower, upper, rest...)
+	vals = [(:lower, lower), (:feasible, upper)]
+	ProgressMeter.update!(l.io, inc - prior, showvalues=vals)
+	atomic_add!(l.nodes_solved, 1)
 end
 
-function update(l::Logger{<:IO}, inc, prior, lower, feas, cut)
-	println(l.tgt, join([lower, feas], " "))
-end
+finish!(l::Logger{<:ProgressThresh}) = ProgressMeter.finish!(l.io)
 
-finish(l::Logger{<:ProgressThresh}) = ProgressMeter.finish!(l.tgt)
-
-finish(l::Logger{<:IO}) = nothing
+stats(l::Logger) = (nodes_solved = l.nodes_solved[],)
