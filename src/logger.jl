@@ -14,9 +14,9 @@ function logger(io::IO, gap)
 	Logger(progress, gap, Atomic{Int}(1))
 end
 
-function update!(l::Logger{<:ProgressThresh}, inc, prior, lower, upper, rest...)
-	vals = [(:lower, lower), (:feasible, upper)]
-	ProgressMeter.update!(l.io, inc - prior, showvalues=vals)
+function update!(l::Logger{<:ProgressThresh}, inc, prior, best, worst, rest...)
+	vals = [(:best_bound, best), (:worst_bound, worst)]
+	ProgressMeter.update!(l.io, abs(inc - prior), showvalues=vals)
 	atomic_add!(l.nodes_solved, 1)
 end
 

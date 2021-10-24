@@ -12,7 +12,8 @@ mutable struct ConcurrentHeap{T}
 	end
 end
 
-make_open_set(branches) = ConcurrentHeap(BinaryHeap(Base.By(first), branches))
+make_open_set(::MinimizeSense, branches) = ConcurrentHeap(BinaryHeap(Base.By(first, Base.Forward), branches))
+make_open_set(::MaximizeSense, branches) = ConcurrentHeap(BinaryHeap(Base.By(first, Base.Reverse), branches))
 
 first(c::ConcurrentHeap) = first(c.data)
 isempty(c::ConcurrentHeap) = isempty(c.data)
