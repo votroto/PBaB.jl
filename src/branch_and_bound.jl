@@ -12,10 +12,10 @@ function solve_root(sense::Sense, node, bound, branch)
 end
 
 isgoodenough(::MaximizeSense, a, b, atol) = isapprox(a, b; atol) || isless(a, b)
-isgoodenough(::MinimizeSense, a, b, atol) = isapprox(a, b; atol) || isless(b, a)
+isgoodenough(::MinimizeSense, a, b, atol) = isapprox(a, b; atol) || !isless(a, b)
 
-atomic_best!(::MaximizeSense, a, b) = atomic_max!(a, b)
-atomic_best!(::MinimizeSense, a, b) = atomic_min!(a, b)
+atomic_best!(::MaximizeSense, a, b) = atomic_update!(a, b; condition=isless)
+atomic_best!(::MinimizeSense, a, b) = atomic_update!(a, b; condition=!isless)
 
 function branch_and_bound(root, bound, branch; sense::Sense=Minimize, gap=eps(), out=stderr)
 	incumbent, pending = solve_root(sense, root, bound, branch)

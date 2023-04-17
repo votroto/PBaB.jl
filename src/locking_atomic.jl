@@ -1,4 +1,3 @@
-import Base.Threads: atomic_min!
 import Base: setindex!, getindex
 
 mutable struct LockingAtomic{T}
@@ -11,10 +10,12 @@ mutable struct LockingAtomic{T}
 	end
 end
 
-function atomic_min!(c::LockingAtomic{T}, b::T) where T
-	if c.data > b
+_always(x...) = true
+
+function atomic_update!(c::LockingAtomic{T}, b::T; condition=_always) where T
+	if condition(c.data, b)
 		lock(c.lock) do
-			if c.data > b
+			if condition(c.data, b)
 				c.data = b
 			end
 		end

@@ -21,8 +21,24 @@ end
 
 # -----------------------------------------------------------------------------
 
+function bab_finds_max(rng=MersenneTwister(2021))
+	dat = heapify(rand(rng, 100))
+
+	out = devnull
+	sense = Maximize
+	root = Node(dat, 1)
+	_bound = (node) -> bound(node; lb = Inf)
+
+	res = branch_and_bound(root, _bound, branch; out, sense)
+	(val, arg), stats = res
+
+	@test val == maximum(dat)
+	@test val == dat[arg]
+	@test stats.nodes_solved == 100
+end
+
 function bab_finds_min(rng=MersenneTwister(2021))
-	dat = -1 .* heapify(shuffle(rng, 1:100))
+	dat = -1 .* heapify(rand(rng, 100))
 
 	out = devnull
 	root = Node(dat, 1)
@@ -35,7 +51,7 @@ function bab_finds_min(rng=MersenneTwister(2021))
 end
 
 function bab_solves_in_root(rng=MersenneTwister(2021))
-	dat = heapify(shuffle(rng, 1:100))
+	dat = heapify(rand(rng, 100))
 
 	out = devnull
 	root = Node(dat, 1)
